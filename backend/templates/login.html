@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center bg-[#fcfcfc]">
+    <div class="w-full max-w-md p-8 fade-in-up">
+        <div class="text-center mb-10">
+            <h2 class="font-serif text-3xl mb-3 text-[color:var(--color-black)]">ברוכים השבים</h2>
+            <p class="font-sans text-gray-400 text-sm tracking-wide">התחברו לחשבון שלכם</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <div id="error-message" class="text-red-500 text-xs text-center hidden font-bold tracking-wide"></div>
+
+            <div>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="אימייל"
+                    class="w-full px-4 py-3 border-b border-gray-200 bg-transparent focus:border-[color:var(--color-black)] outline-none transition-colors placeholder-gray-400 font-sans"
+                    required
+                />
+            </div>
+
+            <div>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="סיסמה"
+                    class="w-full px-4 py-3 border-b border-gray-200 bg-transparent focus:border-[color:var(--color-black)] outline-none transition-colors placeholder-gray-400 font-sans"
+                    required
+                />
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="remember" class="w-4 h-4 rounded-none border-gray-300 text-[color:var(--color-black)] focus:ring-[color:var(--color-black)]">
+                    <label for="remember" class="text-xs text-gray-500 font-sans">זכור אותי</label>
+                </div>
+                <a href="/forgot-password" class="text-xs text-gray-400 hover:text-[color:var(--color-black)] transition-colors font-sans">שכחת סיסמה?</a>
+            </div>
+
+            <button type="submit" class="w-full py-4 bg-[color:var(--color-black)] text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-colors mt-8">
+                התחבר
+            </button>
+        </form>
+
+        <div class="mt-10 text-center border-t border-gray-100 pt-8">
+            <p class="text-xs text-gray-400 font-sans mb-4">עדיין אין לך חשבון?</p>
+            <a href="/register" class="inline-block border border-[color:var(--color-black)] px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-[color:var(--color-black)] hover:text-white transition-colors">
+                הירשם עכשיו
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const remember = document.getElementById('remember').checked;
+    const errorDiv = document.getElementById('error-message');
+
+    errorDiv.classList.add('hidden');
+    errorDiv.textContent = '';
+
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password, remember }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log('Login successful:', data);
+            window.location.href = '/';
+        } else {
+            errorDiv.textContent = data.message || 'שגיאה בהתחברות';
+            errorDiv.classList.remove('hidden');
+        }
+    } catch (err) {
+        errorDiv.textContent = 'שגיאה בתקשורת עם השרת';
+        errorDiv.classList.remove('hidden');
+        console.error('Login error:', err);
+    }
+});
+</script>
+{% endblock %}

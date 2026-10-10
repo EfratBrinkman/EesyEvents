@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center bg-[#fcfcfc]">
+    <div class="w-full max-w-md p-8 fade-in-up">
+        <div class="text-center mb-10">
+            <h2 class="font-serif text-3xl mb-3 text-[color:var(--color-black)]">יצירת חשבון</h2>
+            <p class="font-sans text-gray-400 text-sm tracking-wide">הצטרפו לקהילה שלנו</p>
+        </div>
+
+        <form id="registerForm" class="space-y-6">
+            <div id="error-message" class="text-red-500 text-xs text-center hidden font-bold tracking-wide"></div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="שם פרטי"
+                    class="w-full px-4 py-3 border-b border-gray-200 bg-transparent focus:border-[color:var(--color-black)] outline-none transition-colors placeholder-gray-400 font-sans"
+                    required
+                />
+                <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="שם משפחה"
+                    class="w-full px-4 py-3 border-b border-gray-200 bg-transparent focus:border-[color:var(--color-black)] outline-none transition-colors placeholder-gray-400 font-sans"
+                    required
+                />
+            </div>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="אימייל"
+                class="w-full px-4 py-3 border-b border-gray-200 bg-transparent focus:border-[color:var(--color-black)] outline-none transition-colors placeholder-gray-400 font-sans"
+                required
+            />
+
+            <input
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="טלפון"
+                class="w-full px-4 py-3 border-b border-gray-200 bg-transparent focus:border-[color:var(--color-black)] outline-none transition-colors placeholder-gray-400 font-sans"
+            />
+
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="סיסמה"
+                class="w-full px-4 py-3 border-b border-gray-200 bg-transparent focus:border-[color:var(--color-black)] outline-none transition-colors placeholder-gray-400 font-sans"
+                required
+            />
+
+            <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="אימות סיסמה"
+                class="w-full px-4 py-3 border-b border-gray-200 bg-transparent focus:border-[color:var(--color-black)] outline-none transition-colors placeholder-gray-400 font-sans"
+                required
+            />
+
+            <button type="submit" class="w-full py-4 bg-[color:var(--color-black)] text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-colors mt-8">
+                הירשם
+            </button>
+        </form>
+
+        <div class="mt-10 text-center border-t border-gray-100 pt-8">
+            <p class="text-xs text-gray-400 font-sans mb-4">כבר יש לך חשבון?</p>
+            <a href="/login" class="inline-block border border-[color:var(--color-black)] px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-[color:var(--color-black)] hover:text-white transition-colors">
+                התחבר
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const errorDiv = document.getElementById('error-message');
+
+    errorDiv.classList.add('hidden');
+    errorDiv.textContent = '';
+
+    if (password !== confirmPassword) {
+        errorDiv.textContent = 'הסיסמאות אינן תואמות';
+        errorDiv.classList.remove('hidden');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                phone: phone,
+                password: password
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log('Registration successful:', data);
+            window.location.href = '/login';
+        } else {
+            errorDiv.textContent = data.message || 'שגיאה בהרשמה';
+            errorDiv.classList.remove('hidden');
+        }
+    } catch (err) {
+        errorDiv.textContent = 'שגיאה בתקשורת עם השרת';
+        errorDiv.classList.remove('hidden');
+        console.error('Registration error:', err);
+    }
+});
+</script>
+{% endblock %}

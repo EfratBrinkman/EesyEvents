@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-[color:var(--color-beige)] py-20">
+    <div class="container px-4 md:px-8">
+        <!-- Header -->
+        <div class="text-center mb-16 fade-in-up">
+            <h2 class="font-serif text-4xl md:text-5xl mb-6 text-[color:var(--color-black)]">האירועים שלי</h2>
+            <p class="font-sans text-gray-500 text-sm tracking-widest uppercase">ניהול ומעקב אחר האירועים שלך</p>
+        </div>
+
+        {% if events %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto fade-in-up delay-100">
+            {% for event in events %}
+            <div class="bg-white shadow-sm hover:shadow-2xl transition-all duration-500 group relative overflow-hidden flex flex-col">
+                <!-- Image Header -->
+                <div class="h-64 overflow-hidden relative">
+                    <img src="{% if event.event_type == 'wedding' %}https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop
+                              {% elif event.event_type == 'bar-mitzvah' %}{{ url_for('static', filename='images/bar-mitzvah/bar-mitzvah1.jpg') }}
+                              {% elif event.event_type == 'brit' %}https://images.pexels.com/photos/265987/pexels-photo-265987.jpeg?auto=compress&cs=tinysrgb&w=800
+                              {% elif event.event_type == 'engagement' %}https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=800&auto=format&fit=crop
+                              {% elif event.event_type == 'party' %}https://images.pexels.com/photos/1190298/pexels-photo-1190298.jpeg?auto=compress&cs=tinysrgb&w=800
+                              {% elif event.event_type == 'business' %}https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop
+                              {% elif event.event_type == 'birthday' %}https://images.unsplash.com/photo-1464349153735-7db50ed83c84?q=80&w=800&auto=format&fit=crop
+                              {% else %}https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800&auto=format&fit=crop{% endif %}" 
+                         alt="{{ event.event_type }}" 
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale-[20%] group-hover:grayscale-0">
+                    
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+
+                    <!-- Status Badge -->
+                    <div class="absolute top-4 left-4">
+                        <span class="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-white/90 backdrop-blur-md text-[color:var(--color-espresso)] shadow-sm">
+                            {{ event.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-8 border-x border-b border-gray-50 flex-1 flex flex-col">
+                    <!-- Title -->
+                    <h3 class="font-serif text-2xl text-center mb-2 text-[color:var(--color-espresso)]">
+                        {% if event.event_type == 'wedding' %}חתונה
+                        {% elif event.event_type == 'bar-mitzvah' %}בר/בת מצווה
+                        {% elif event.event_type == 'brit' %}ברית/ה
+                        {% elif event.event_type == 'engagement' %}אירוסין/חינה
+                        {% elif event.event_type == 'party' %}מסיבה פרטית
+                        {% elif event.event_type == 'business' %}אירוע עסקי
+                        {% elif event.event_type == 'birthday' %}יום הולדת
+                        {% else %}אירוע כללי{% endif %}
+                    </h3>
+
+                    <p class="text-center text-[color:var(--color-mocca)] text-xs uppercase tracking-widest mb-8">
+                        {{ event.date or 'תאריך לא נקבע' }}
+                    </p>
+
+                    <!-- Details -->
+                    <div class="space-y-4 mb-8 border-t border-gray-100 pt-6 flex-1">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400 font-light">אורחים</span>
+                            <span class="font-bold text-[color:var(--color-coffee)]">{{ event.guests or '-' }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400 font-light">תקציב</span>
+                            <span class="font-bold text-[color:var(--color-coffee)]">
+                                {% if event.budget == 'low' %}עד 50k
+                                {% elif event.budget == 'medium' %}50k - 100k
+                                {% elif event.budget == 'high' %}100k - 200k
+                                {% elif event.budget == 'premium' %}200k - 350k
+                                {% elif event.budget == 'luxury' %}350k+
+                                {% else %}-{% endif %}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400 font-light">אזור</span>
+                            <span class="font-bold text-[color:var(--color-coffee)]">
+                                {% if event.region == 'north' %}צפון
+                                {% elif event.region == 'sharon' %}השרון
+                                {% elif event.region == 'center' %}מרכז
+                                {% elif event.region == 'jerusalem' %}ירושלים
+                                {% elif event.region == 'south' %}דרום
+                                {% else %}{{ event.region or '-' }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Action -->
+                    <a href="/event/{{ event.id }}/manage" class="block w-full py-4 bg-[color:var(--color-espresso)] text-white hover:bg-[color:var(--color-coffee)] transition-colors text-[11px] uppercase tracking-[0.2em] font-bold text-center mt-auto">
+                        ניהול אירוע
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Add New Event Card -->
+            <a href="/plan" class="flex flex-col items-center justify-center p-8 border border-dashed border-[color:var(--color-vanilla)] hover:border-[color:var(--color-caramel)] transition-colors group min-h-[400px] bg-white/50 hover:bg-white">
+                <div class="w-20 h-20 rounded-full bg-[color:var(--color-beige)] flex items-center justify-center mb-6 group-hover:bg-[color:var(--color-vanilla)] transition-colors duration-500">
+                    <span class="text-3xl text-[color:var(--color-almond)] group-hover:text-white font-light transition-colors">+</span>
+                </div>
+                <span class="font-serif text-xl text-[color:var(--color-almond)] group-hover:text-[color:var(--color-caramel)] transition-colors">יצירת אירוע חדש</span>
+            </a>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-20 bg-white max-w-2xl mx-auto shadow-sm border border-gray-100 fade-in-up delay-100">
+            <div class="text-6xl mb-6">📅</div>
+            <h3 class="font-serif text-2xl mb-4 text-[color:var(--color-black)]">עדיין אין לך אירועים</h3>
+            <p class="text-gray-500 mb-8 font-sans">זה הזמן להתחיל לתכנן את האירוע המושלם שלך</p>
+            <a href="/plan" class="inline-block bg-[color:var(--color-black)] text-white px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-opacity-90 transition-opacity">
+                צור אירוע ראשון
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
